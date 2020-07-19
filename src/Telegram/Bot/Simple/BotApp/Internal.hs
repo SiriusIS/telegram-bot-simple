@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE DeriveFunctor       #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -117,7 +118,9 @@ processActionJob botApp botEnv@BotEnv{..} = do
 processActionsIndefinitely
   :: BotApp model action -> BotEnv model action -> IO ThreadId
 processActionsIndefinitely botApp botEnv = forkIO . forever $ do
-  runClientM (processActionJob botApp botEnv) (botClientEnv botEnv)
+  runClientM (processActionJob botApp botEnv) (botClientEnv botEnv) >>= \case
+     Right x -> pure ()
+     Left e -> print e
 
 -- | Start 'Telegram.Update' polling for a bot.
 startBotPolling :: BotApp model action -> BotEnv model action -> ClientM ()
